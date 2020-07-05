@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Old Branch Reminder
-      uses: arup-group/action-notify-unused-branches@master
+      uses: arup-group/action-notify-unused-branches@v5
       with:
         daysOld: 90
         excludedAuthor: peterjgrainger
