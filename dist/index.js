@@ -1906,8 +1906,9 @@ function oldBranchNotify(actionContext) {
                 return actionContext.octokit.repos.getBranch(Object.assign(Object.assign({}, repoInfo), { branch: branch.name }));
             }));
             const branchExtraInfo = yield Promise.all(branchRequests);
+            // If user has been deleted author will be
             const branchWithAuthor = branchExtraInfo
-                .filter(branch => branch.data.commit.author.login !== excludedAuthor)
+                .filter(branch => branch.data.commit.author !== null && branch.data.commit.author.login !== excludedAuthor)
                 .map(value => {
                 return {
                     author: value.data.commit.commit.author,

@@ -10,7 +10,6 @@ export async function oldBranchNotify(
     const numberOfDaysToLookIntoPast = parseInt(
       actionContext.getInput('daysOld')
     )
-
     const excludedAuthor = actionContext.getInput('excludedAuthor')
 
     const listBranchesResponse = await actionContext.octokit.repos.listBranches(
@@ -32,8 +31,13 @@ export async function oldBranchNotify(
 
     const branchExtraInfo = await Promise.all(branchRequests)
 
+    // If user has been deleted author will be
     const branchWithAuthor = branchExtraInfo
-      .filter(branch => branch.data.commit.author.login !== excludedAuthor)
+      .filter(
+        branch =>
+          branch.data.commit.author !== null &&
+          branch.data.commit.author.login !== excludedAuthor
+      )
       .map(value => {
         return {
           author: value.data.commit.commit.author,

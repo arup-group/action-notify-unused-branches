@@ -20,6 +20,7 @@ let createIssueSpy: jest.SpyInstance
 const octokit = GitHub.getOctokit('fakeToken')
 let getInput: (parameter: string) => string
 let excludedAuthor: string
+let setFailed = jest.fn()
 
 // Context coming from github action
 beforeEach(() => {
@@ -138,12 +139,39 @@ test('expect no issues to be created if author is excluded', async () => {
   expect(createIssueSpy).not.toHaveBeenCalled()
 })
 
+describe('when author has left GitHub', () => {
+  beforeEach(() => {
+    getBranchData.commit.author = (null as unknown) as {
+      gravatar_id: string
+      avatar_url: string
+      url: string
+      id: number
+      login: string
+    }
+    getBranchData.commit.commit.author = (null as unknown) as {
+      name: string
+      date: string
+      email: string
+    }
+  })
+
+  test('expect unknown author if user has left github', async () => {
+    await triggerEvent()
+    expect(createIssueSpy).not.toHaveBeenCalled()
+  })
+
+  test('expect setFailed to not have been called', async () => {
+    await triggerEvent()
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+})
+
 async function triggerEvent() {
   await oldBranchNotify({
     octokit,
     context,
     getInput: getInput,
     debug: jest.fn(),
-    setFailed: jest.fn()
+    setFailed: setFailed
   })
 }
